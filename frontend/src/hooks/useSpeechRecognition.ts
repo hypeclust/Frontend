@@ -46,22 +46,36 @@ declare global {
   }
 }
 
-export const useSpeechRecognition = (
-  onTranscript: (text: string, isFinal: boolean) => void,
-  onFinalTranscript: (text: string) => void
-) => {
-  const [isListening, setIsListening] = useState(false);
+interface UseSpeechRecognitionProps {
+  isListening: boolean;
+  onSpeechEnd?: (text: string) => void;
+  onTranscript?: (text: string) => void;
+}
+
+export const useSpeechRecognition = ({ 
+  isListening, 
+  onSpeechEnd, 
+  onTranscript 
+}: UseSpeechRecognitionProps) => {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+
+  // Use refs for callbacks to avoid stale closures in the recognition instance
+  const onSpeechEndRef = useRef(onSpeechEnd);
+  const onTranscriptRef = useRef(onTranscript);
+
+  useEffect(() => {
+    onSpeechEndRef.current = onSpeechEnd;
+    onTranscriptRef.current = onTranscript;
+  }, [onSpeechEnd, onTranscript]);
 
   const startListening = useCallback(() => {
-    if (isListening) return;
+    // Prevent multiple starts
+    if (recognitionRef.current) return;
 
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognitionAPI) {
-      console.error('Speech Recognition API not supported in this browser');
-      return;
-    }
+    if (!SpeechRecognitionAPI) return;
 
     const recognition = new SpeechRecognitionAPI();
     recognition.continuous = true;
@@ -73,51 +87,70 @@ export const useSpeechRecognition = (
       let finalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
+        const t = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
+          finalTranscript += t + ' ';
         } else {
-          interimTranscript += transcript;
+          interimTranscript += t;
         }
       }
 
-      if (interimTranscript) {
-        onTranscript(interimTranscript, false);
-      }
+      const currentText = finalTranscript || interimTranscript;
+      setTranscript(currentText);
+      if (onTranscriptRef.current) onTranscriptRef.current(currentText);
 
-      if (finalTranscript) {
-        onTranscript(finalTranscript.trim(), true);
-        onFinalTranscript(finalTranscript.trim());
+      if (finalTranscript && onSpeechEndRef.current) {
+        onSpeechEndRef.current(finalTranscript.trim());
+        setTranscript(''); // Clear after processing
       }
     };
 
     recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event);
+      // Ignore 'aborted' errors which happen on manual stop
+      if ((event as any).error !== 'aborted') {
+        console.error('Speech recognition error:', event);
+      }
     };
 
     recognition.onend = () => {
-      if (isListening) {
-        // Restart if still supposed to be listening
-        recognition.start();
-      }
+      setListening(false);
+      recognitionRef.current = null;
+      
+      // Auto-restart if still supposed to be listening (and not manually stopped)
+      // We need to check the LATEST isListening prop here, but we can't easily access it in this closure
+      // without triggering a restart loop. 
+      // Instead, we rely on the useEffect below to restart it if needed.
     };
 
     try {
       recognition.start();
       recognitionRef.current = recognition;
-      setIsListening(true);
+      setListening(true);
     } catch (error) {
       console.error('Error starting speech recognition:', error);
     }
-  }, [isListening, onTranscript, onFinalTranscript]);
+  }, []); // No dependencies! Refs handle the callbacks.
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       recognitionRef.current = null;
-      setIsListening(false);
+      setListening(false);
     }
   }, []);
+
+  const resetTranscript = useCallback(() => {
+    setTranscript('');
+  }, []);
+
+  // Sync with isListening prop
+  useEffect(() => {
+    if (isListening && !listening) {
+      startListening();
+    } else if (!isListening && listening) {
+      stopListening();
+    }
+  }, [isListening, listening, startListening, stopListening]);
 
   useEffect(() => {
     return () => {
@@ -127,5 +160,11 @@ export const useSpeechRecognition = (
     };
   }, []);
 
-  return { isListening, startListening, stopListening };
+  return { 
+    transcript, 
+    resetTranscript, 
+    listening, 
+    startListening, 
+    stopListening 
+  };
 };
