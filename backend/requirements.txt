@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+websockets
+pyaudio
+pydub
+gpiozero
+google-generativeai
+python-dotenv

@@ -1,0 +1,418 @@
+{
+  "menu_items": [
+    {
+      "id": "coffee_original",
+      "name": "Original Blend Coffee",
+      "description": "Tim Hortons signature coffee blend",
+      "basePrice": 1.89,
+      "category": "Hot Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Small",
+            "Medium",
+            "Large",
+            "Extra Large"
+          ]
+        },
+        {
+          "name": "Cream",
+          "choices": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        {
+          "name": "Sugar",
+          "choices": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coffee_dark_roast",
+      "name": "Dark Roast Coffee",
+      "description": "Rich and bold dark roast coffee",
+      "basePrice": 1.89,
+      "category": "Hot Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Small",
+            "Medium",
+            "Large",
+            "Extra Large"
+          ]
+        },
+        {
+          "name": "Cream",
+          "choices": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        {
+          "name": "Sugar",
+          "choices": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "french_vanilla",
+      "name": "French Vanilla",
+      "description": "Smooth and creamy vanilla beverage",
+      "basePrice": 2.49,
+      "category": "Hot Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Small",
+            "Medium",
+            "Large",
+            "Extra Large"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hot_chocolate",
+      "name": "Hot Chocolate",
+      "description": "Rich and creamy hot chocolate",
+      "basePrice": 2.19,
+      "category": "Hot Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Small",
+            "Medium",
+            "Large",
+            "Extra Large"
+          ]
+        },
+        {
+          "name": "Whipped Cream",
+          "choices": [
+            "No",
+            "Yes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iced_coffee",
+      "name": "Iced Coffee",
+      "description": "Refreshing cold coffee",
+      "basePrice": 2.79,
+      "category": "Cold Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Small",
+            "Medium",
+            "Large"
+          ]
+        },
+        {
+          "name": "Cream",
+          "choices": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ]
+        },
+        {
+          "name": "Sugar",
+          "choices": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iced_capp",
+      "name": "Iced Capp",
+      "description": "Frozen coffee blended beverage",
+      "basePrice": 3.49,
+      "category": "Cold Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Small",
+            "Medium",
+            "Large"
+          ]
+        },
+        {
+          "name": "Flavor",
+          "choices": [
+            "Original",
+            "Vanilla",
+            "Mocha",
+            "Caramel"
+          ]
+        },
+        {
+          "name": "Whipped Cream",
+          "choices": [
+            "No",
+            "Yes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cold_brew",
+      "name": "Cold Brew",
+      "description": "Smooth cold-steeped coffee",
+      "basePrice": 3.29,
+      "category": "Cold Beverages",
+      "options": [
+        {
+          "name": "Size",
+          "choices": [
+            "Medium",
+            "Large"
+          ]
+        },
+        {
+          "name": "Cream",
+          "choices": [
+            "0",
+            "1",
+            "2"
+          ]
+        },
+        {
+          "name": "Sweetener",
+          "choices": [
+            "None",
+            "Vanilla",
+            "Caramel"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "donut_honey_cruller",
+      "name": "Honey Cruller",
+      "description": "Light and airy honey-glazed donut",
+      "basePrice": 1.49,
+      "category": "Donuts",
+      "options": []
+    },
+    {
+      "id": "donut_chocolate_dip",
+      "name": "Chocolate Dip",
+      "description": "Soft donut with chocolate glaze",
+      "basePrice": 1.49,
+      "category": "Donuts",
+      "options": []
+    },
+    {
+      "id": "donut_boston_cream",
+      "name": "Boston Cream",
+      "description": "Vanilla cream filled donut with chocolate topping",
+      "basePrice": 1.79,
+      "category": "Donuts",
+      "options": []
+    },
+    {
+      "id": "donut_old_fashioned",
+      "name": "Old Fashioned Plain",
+      "description": "Classic cake-style donut",
+      "basePrice": 1.49,
+      "category": "Donuts",
+      "options": []
+    },
+    {
+      "id": "timbits_10",
+      "name": "Timbits (10 pack)",
+      "description": "Assorted donut holes - 10 count",
+      "basePrice": 2.49,
+      "category": "Timbits",
+      "options": [
+        {
+          "name": "Variety",
+          "choices": [
+            "Assorted",
+            "Chocolate Glazed",
+            "Honey Dip",
+            "Old Fashioned Plain"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "timbits_20",
+      "name": "Timbits (20 pack)",
+      "description": "Assorted donut holes - 20 count",
+      "basePrice": 4.49,
+      "category": "Timbits",
+      "options": [
+        {
+          "name": "Variety",
+          "choices": [
+            "Assorted",
+            "Chocolate Glazed",
+            "Honey Dip",
+            "Old Fashioned Plain"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bagel_plain",
+      "name": "Plain Bagel",
+      "description": "Classic plain bagel",
+      "basePrice": 1.89,
+      "category": "Bagels",
+      "options": [
+        {
+          "name": "Toasted",
+          "choices": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Cream Cheese",
+          "choices": [
+            "None",
+            "Plain",
+            "Herb & Garlic",
+            "Strawberry"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bagel_everything",
+      "name": "Everything Bagel",
+      "description": "Bagel topped with sesame, poppy seeds, garlic, and onion",
+      "basePrice": 1.89,
+      "category": "Bagels",
+      "options": [
+        {
+          "name": "Toasted",
+          "choices": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Cream Cheese",
+          "choices": [
+            "None",
+            "Plain",
+            "Herb & Garlic",
+            "Strawberry"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bagel_cinnamon_raisin",
+      "name": "Cinnamon Raisin Bagel",
+      "description": "Sweet bagel with cinnamon and raisins",
+      "basePrice": 1.89,
+      "category": "Bagels",
+      "options": [
+        {
+          "name": "Toasted",
+          "choices": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "name": "Cream Cheese",
+          "choices": [
+            "None",
+            "Plain",
+            "Herb & Garlic",
+            "Strawberry"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breakfast_sandwich",
+      "name": "Egg & Cheese on English Muffin",
+      "description": "Freshly cracked egg with cheese on a toasted English muffin",
+      "basePrice": 3.49,
+      "category": "Breakfast",
+      "options": [
+        {
+          "name": "Add Meat",
+          "choices": [
+            "None",
+            "Bacon",
+            "Sausage",
+            "Ham"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breakfast_wrap",
+      "name": "Breakfast Wrap",
+      "description": "Scrambled egg, cheese, and choice of meat in a grilled tortilla",
+      "basePrice": 4.29,
+      "category": "Breakfast",
+      "options": [
+        {
+          "name": "Meat",
+          "choices": [
+            "Bacon",
+            "Sausage",
+            "Ham"
+          ]
+        },
+        {
+          "name": "Chipotle Sauce",
+          "choices": [
+            "No",
+            "Yes"
+          ]
+        }
+      ]
+    }
+  ],
+  "modifiers_pricing": {
+    "Medium": 0.40,
+    "Large": 0.70,
+    "Extra Large": 1.00,
+    "Whipped Cream": 0.50,
+    "Cream Cheese": 1.29,
+    "Bacon": 1.50,
+    "Sausage": 1.50,
+    "Ham": 1.50
+  }
+}
