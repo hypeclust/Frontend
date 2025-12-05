@@ -43,10 +43,14 @@ async def get_inventory():
 @app.post("/reset_conversation")
 async def reset_conversation():
     """Reset AI conversation for a new customer"""
-    from .ai_service import get_ai_service
-    ai = get_ai_service()
-    ai.reset_conversation()
-    return {"status": "reset"}
+    try:
+        from ai_service import get_ai_service
+        ai = get_ai_service()
+        ai.reset_conversation()
+        return {"status": "reset"}
+    except Exception as e:
+        print(f"Error resetting conversation: {e}")
+        return {"status": "error", "message": str(e)}
 
 
 # WebSocket Connection Manager
@@ -93,7 +97,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         
                         try:
                             # Get AI service
-                            from .ai_service import get_ai_service
+                            from ai_service import get_ai_service
                             ai = get_ai_service()
                             
                             # Process with Gemini

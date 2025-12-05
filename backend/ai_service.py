@@ -13,11 +13,13 @@ class AIService:
         self.deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
         
         if not self.gemini_api_key:
-            raise ValueError("GEMINI_API_KEY not found in .env file")
+            print("WARNING: GEMINI_API_KEY not found in .env file. AI features will be disabled.")
+            self.model = None
+        else:
+            # Configure Gemini
+            genai.configure(api_key=self.gemini_api_key)
+            self.model = genai.GenerativeModel('gemini-2.5-flash-lite')
         
-        # Configure Gemini
-        genai.configure(api_key=self.gemini_api_key)
-        self.model = genai.GenerativeModel('gemini-2.5-flash-lite')
         self.chat = None
         
         # Load menu
@@ -42,6 +44,7 @@ TIM HORTONS KEYWORDS & SLANG:
 
 RULES:
 1. **CRITICAL**: When the customer adds, removes, or modifies an item, you MUST output a JSON block FIRST, followed by your natural response.
+2. **MAX QUANTITY**: The maximum quantity allowed per item is {menu_data.get('max_quantity', 10)}. If a user requests more than this, politely decline and ask them to speak with an employee.
 2. **JSON FORMAT**:
    - Add Item: {{"action": "add_to_cart", "item_id": "...", "name": "...", "modifiers": [...], "price": ...}}
    - Remove Item: {{"action": "remove_item", "item_id": "..."}}
@@ -52,7 +55,7 @@ RULES:
 5. Recognize keywords: "double double" (2 cream 2 sugar), "regular" (1 cream 1 sugar), "Timmies".
 6. If the order is ambiguous, ask clarifying questions (size, etc.) BEFORE adding to cart.
 7. DO NOT explain the JSON. Just output it.
-8. **TAX RULE**: Prices in the menu are pre-tax. HST is 13%. When stating the total, you MUST calculate (Subtotal * 1.13) and round to 2 decimal places. Say "Your total with tax is $X.XX".
+8. **TAX RULE**: Prices in the menu are pre-tax. HST is 13%.
 9. **FINALIZE ORDER**: When the user says "that's it", "I'm done", "that's all", or similar completion phrases, output {{"action": "finalize_order"}} to trigger automatic checkout.
 
 EXAMPLES:
@@ -69,6 +72,10 @@ You: {{"action": "finalize_order"}}
 
 Remember: Keep it SHORT and NATURAL. Don't explain the JSON, just include it in your response."""
 
+        if not self.model:
+            print("AI Model not initialized. Skipping conversation start.")
+            return
+
         self.chat = self.model.start_chat(history=[])
         # Send system prompt as first message
         self.chat.send_message(system_prompt)
@@ -80,6 +87,12 @@ Remember: Keep it SHORT and NATURAL. Don't explain the JSON, just include it in 
     
     async def process_user_message(self, user_text: str, current_cart: list) -> Dict[str, Any]:
         
+        if not self.model:
+            return {
+                "text": "I'm sorry, I cannot process your request because the AI service is not configured.",
+                "actions": []
+            }
+
         if not self.chat:
             self.start_conversation(self.menu_data)
         

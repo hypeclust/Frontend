@@ -1,6 +1,6 @@
 
 import { useEffect, useState, useRef } from 'react';
-import { Mic, ShoppingBag, Activity, History, CheckCircle, MicOff } from 'lucide-react';
+import { Mic, ShoppingBag, Activity, History, CheckCircle, MicOff, Terminal, X } from 'lucide-react';
 import { useKioskStore } from './store/useKioskStore';
 import CartItem from './components/CartItem';
 import OrderHistory from './components/OrderHistory';
@@ -29,7 +29,7 @@ function AppContent() {
     connectionStatus, setConnectionStatus,
     isListening, setIsListening,
     isProcessing, setIsProcessing,
-    transcript: storeTranscript, setTranscript,
+    setTranscript,
     messages, addMessage,
     cart, addToCart, removeFromCart, clearCart,
     orderHistory, completeOrder
@@ -40,6 +40,7 @@ function AppContent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isDevMode, setIsDevMode] = useState(false);
+  const [isDebugOpen, setIsDebugOpen] = useState(false);
 
   // Text-to-Speech Hook
   const { speak, stop: stopTTS, isSpeaking } = useSpeechSynthesis();
@@ -131,8 +132,6 @@ function AppContent() {
   // Speech Recognition Hook - Real voice transcription
   const {
     transcript,
-    resetTranscript,
-    listening: micListening,
     startListening: startSpeech,
     stopListening: stopSpeech
   } = useSpeechRecognition({
@@ -229,16 +228,20 @@ function AppContent() {
             }
           });
 
+          // Speak the total to the user (Ensures sync with PubNub)
+          speak(`Your total comes to $${total_str}. Please tap your card to pay.`, () => {
+             // Wait 3 seconds after speech finishes before resetting
+             console.log("Speech finished. Waiting 3s before standby...");
+             setTimeout(() => {
+               setAwake(false);
+               setIsListening(false);
+               stopTTS();
+               console.log("Kiosk going to standby.");
+             }, 3000);
+          });
+
           // Complete order locally regardless of PubNub status
           completeOrder();
-          
-          // Go to standby after a short delay (let TTS finish)
-          setTimeout(() => {
-            setAwake(false);
-            setIsListening(false);
-            stopTTS();
-            console.log("Kiosk going to standby. Waiting for next trigger.");
-          }, 2000);
         }
       } catch (e) {
         console.error("Audio socket parse error", e);
@@ -488,50 +491,67 @@ function AppContent() {
         orders={orderHistory}
       />
       {/* Debug Panel - Temporary */}
-      <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs font-mono z-50 max-w-xs">
-        <h3 className="font-bold mb-2 border-b border-gray-600 pb-1">Debug Info</h3>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-3">
-          <span>isAwake:</span> <span className={isAwake ? "text-green-400" : "text-red-400"}>{String(isAwake)}</span>
-          <span>isListening:</span> <span className={isListening ? "text-green-400" : "text-red-400"}>{String(isListening)}</span>
-          <span>isProcessing:</span> <span className={isProcessing ? "text-yellow-400" : "text-gray-400"}>{String(isProcessing)}</span>
-          <span>isSpeaking:</span> <span className={isSpeaking ? "text-blue-400" : "text-gray-400"}>{String(isSpeaking)}</span>
-        </div>
-        <button 
-          onClick={() => {
-            console.log("Manual TTS Test Triggered");
-            setIsListening(false);
-            speak("This is a test of the voice system.", () => setIsListening(true));
-          }}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded mb-2"
-        >
-          Test Voice (Click Me)
-        </button>
+      {/* Debug Panel Toggle / Content */}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
         
-        {isDevMode && (
-          <button 
-            onClick={() => {
-              console.log("Simulating PubNub Trigger ON");
-              // Manually call the logic that would happen on trigger
-              if (hasInteracted && !isAwake) {
-                setAwake(true);
-                const welcomeMessage = "Welcome to Tim Hortons! How can I help you today?";
-                addMessage({ role: 'assistant', text: welcomeMessage, type: 'normal' });
+        {/* Toggle Button */}
+        <button 
+          onClick={() => setIsDebugOpen(!isDebugOpen)}
+          className="bg-gray-800 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg transition-all"
+        >
+          {isDebugOpen ? <X size={20} /> : <Terminal size={20} />}
+        </button>
+
+        {/* Panel Content */}
+        {isDebugOpen && (
+          <div className="mt-2 bg-black/90 text-white p-4 rounded-xl text-xs font-mono w-64 shadow-2xl backdrop-blur-md border border-gray-700">
+            <h3 className="font-bold mb-2 border-b border-gray-600 pb-1 flex justify-between items-center">
+              Debug Info
+              <span className="text-[10px] text-gray-400">v1.0</span>
+            </h3>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-3">
+              <span>isAwake:</span> <span className={isAwake ? "text-green-400" : "text-red-400"}>{String(isAwake)}</span>
+              <span>isListening:</span> <span className={isListening ? "text-green-400" : "text-red-400"}>{String(isListening)}</span>
+              <span>isProcessing:</span> <span className={isProcessing ? "text-yellow-400" : "text-gray-400"}>{String(isProcessing)}</span>
+              <span>isSpeaking:</span> <span className={isSpeaking ? "text-blue-400" : "text-gray-400"}>{String(isSpeaking)}</span>
+            </div>
+            <button 
+              onClick={() => {
+                console.log("Manual TTS Test Triggered");
                 setIsListening(false);
-                speak(welcomeMessage, () => {
-                   if (isAwake) setIsListening(true);
-                });
-              } else {
-                console.warn("Cannot simulate trigger: User has not interacted or already awake");
-              }
-            }}
-            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-2 rounded mb-2"
-          >
-            Simulate Trigger (Dev)
-          </button>
+                speak("This is a test of the voice system.", () => setIsListening(true));
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-2 rounded mb-2 transition-colors"
+            >
+              Test Voice
+            </button>
+            
+            {isDevMode && (
+              <button 
+                onClick={() => {
+                  console.log("Simulating PubNub Trigger ON");
+                  if (hasInteracted && !isAwake) {
+                    setAwake(true);
+                    const welcomeMessage = "Welcome to Tim Hortons! How can I help you today?";
+                    addMessage({ role: 'assistant', text: welcomeMessage, type: 'normal' });
+                    setIsListening(false);
+                    speak(welcomeMessage, () => {
+                       if (isAwake) setIsListening(true);
+                    });
+                  } else {
+                    console.warn("Cannot simulate trigger: User has not interacted or already awake");
+                  }
+                }}
+                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-1.5 px-2 rounded mb-2 transition-colors"
+              >
+                Simulate Trigger
+              </button>
+            )}
+            <div className="text-gray-500 text-[10px] text-center mt-1">
+              Cognitive Access System
+            </div>
+          </div>
         )}
-        <div className="text-gray-400 text-[10px]">
-          Click "Test Voice" to verify audio permissions.
-        </div>
       </div>
     </div>
   );
